@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Home - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="algoliasearchHelper.module_url.html">url</a></li><li><a href="module-algoliasearchHelper.html">algoliasearchHelper</a></li></ul><h3>Classes</h3><ul><li><a href="AlgoliaSearchHelper.html">AlgoliaSearchHelper</a></li><li><a href="SearchParameters.html">SearchParameters</a></li><li><a href="SearchResults.html">SearchResults</a></li></ul><h3>Global</h3><ul><li><a href="global.html#recSort">recSort</a></li></ul>
+</nav>
+
+<div id="main">
+    
+
+    
+
+
+
+    
+
+
+
+
+
+
+
+
+
+    
+
+
+    <section class="readme">
+        <article><p><em>Coming from V1 (or js client v2)?</em> Read the <a href="https://github.com/algolia/algoliasearch-helper-js/wiki/Migration-guide-:-V1-to-V2">migration guide</a> to the new version of the Helper.</p>
+<h1>algoliasearch-helper-js</h1><p>This module is the companion of the <a href="https://github.com/algolia/algoliasearch-client-js">algolia/algoliasearch-client-js</a>. It helps you keep
+track of the search parameters and provides a higher level API.</p>
+<p>This is the library you will need to easily build a good search UX like our <a href="http://demos.algolia.com/instant-search-demo/">instant search demo</a>.</p>
+<p><a href="http://algolia.github.io/algoliasearch-helper-js/">See the helper in action</a></p>
+<p><a href="https://npmjs.org/package/algoliasearch-helper"><img src="https://img.shields.io/npm/v/algoliasearch-helper.svg?style=flat-square" alt="Version"></a> <a href="https://travis-ci.org/algolia/algoliasearch-helper-js"><img src="https://img.shields.io/travis/algolia/algoliasearch-helper-js/master.svg?style=flat-square" alt="Build Status"></a> <a href="LICENSE"><img src="http://img.shields.io/badge/license-MIT-green.svg?style=flat-square" alt="License"></a> <a href="http://npm-stat.com/charts.html?package=algoliasearch-helper"><img src="https://img.shields.io/npm/dm/algoliasearch-helper.svg?style=flat-square" alt="Downloads"></a></p>
+<p><a href="https://saucelabs.com/u/as-helper-js"><img src="https://saucelabs.com/browser-matrix/as-helper-js.svg" alt="Browser tests"></a></p>
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+<ul>
+<li><a href="#features">Features</a></li>
+<li><a href="#example">Example</a></li>
+<li><a href="#helper-cheatsheet">Helper cheatsheet</a><ul>
+<li><a href="#add-the-helper-in-your-project">Add the helper in your project</a></li>
+<li><a href="#regular-script-tag">Regular <code>&lt;script&gt;</code> tag</a></li>
+<li><a href="#with-npm">With NPM</a></li>
+<li><a href="#with-bower">With bower</a></li>
+<li><a href="#init-the-helper">Init the helper</a></li>
+<li><a href="#helper-lifecycle">Helper lifecycle</a></li>
+<li><a href="#objects">Objects</a></li>
+<li><a href="#search">Search</a></li>
+<li><a href="#events">Events</a></li>
+<li><a href="#query">Query</a></li>
+<li><a href="#filtering-results">Filtering results</a></li>
+<li><a href="#facet-utilities">Facet utilities</a></li>
+<li><a href="#tags">Tags</a></li>
+<li><a href="#pagination">Pagination</a></li>
+<li><a href="#index">Index</a></li>
+<li><a href="#one-time-query">One time query</a></li>
+<li><a href="#url-helpers">URL Helpers</a></li>
+<li><a href="#query-parameters">Query parameters</a></li>
+<li><a href="#results-format">Results format</a></li>
+<li><a href="#browser-support">Browser support</a></li>
+</ul>
+</li>
+</ul>
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+<h2>Features</h2><ul>
+<li>Search parameters management</li>
+<li>Facets exclusions</li>
+<li>Pagination</li>
+<li>Disjunctive faceting (search on two or more values of the same facet)</li>
+</ul>
+<h2>Example</h2><p>A small example that uses Browserify to manage modules.</p>
+<pre class="prettyprint source lang-js"><code>var algoliasearch = require('algoliasearch');
+var algoliasearchHelper = require('algoliasearch-helper');
+
+var client = algoliasearch('appId', 'apiKey');
+
+var helper = algoliasearchHelper(client, 'indexName', {
+  facets: ['mainCharacterFirstName', 'year'],
+  disjunctiveFacets: ['director']
+});
+
+helper.on('result', function(data){
+  console.log(data.hits);
+});
+
+helper.addDisjunctiveFacetRefinement('director', 'Clint Eastword');
+helper.addDisjunctiveFacetRefinement('director', 'Sofia Coppola');
+
+helper.addNumericRefinement('year', '=', 2003);
+
+// Search for any movie filmed in 2003 and directed by either C. Eastwood or S. Coppola
+helper.search();</code></pre><h2>Helper cheatsheet</h2><p><a href="http://algolia.github.io/algoliasearch-helper-js/docs">There is also a complete JSDoc</a></p>
+<h3>Add the helper in your project</h3><h3>Regular <code>&lt;script&gt;</code> tag</h3><p>Use our <a href="http://www.jsdelivr.com/">jsDelivr</a> build:</p>
+<p><code>&lt;script src=&quot;//cdn.jsdelivr.net/algoliasearch.helper/2/algoliasearch.helper.min.js&quot;&gt;&lt;/script&gt;</code></p>
+<h3>With NPM</h3><p><code>npm install algoliasearch-helper</code></p>
+<h3>With bower</h3><p><code>bower install algoliasearch-helper</code></p>
+<h3>Init the helper</h3><pre class="prettyprint source lang-js"><code>var helper = algoliasearchHelper(client, 'indexName'/*, parameters*/);</code></pre><h3>Helper lifecycle</h3><ol>
+<li><p>modify the parameters of the search (usually through user interactions)<br/></p>
+<pre class="prettyprint source"><code> ```
+     helper.setQuery('iphone').addFacetRefinement('category', 'phone')
+ ```</code></pre></li>
+<li><p>trigger the search (after all the modification have been applied)<br/></p>
+<pre class="prettyprint source"><code> ```
+ helper.search()
+ ```</code></pre></li>
+<li><p>read the results (with the event &quot;result&quot; handler) and update the UI with the results<br/></p>
+<pre class="prettyprint source"><code> ```
+ helper.on('result', function(results) {
+   updateUI(results);
+ });
+ ```</code></pre></li>
+<li><p>go back to 1</p>
+</li>
+</ol>
+<h3>Objects</h3><p><strong>AlgoliasearchHelper</strong>: the helper. Keeps the state of the search, makes the queries and calls the handlers when an event happen.</p>
+<p><strong>SearchParameters</strong>: the object representing the state of the search. The current state is stored in <code>helperInstance.state</code>.</p>
+<p><strong>SearchResults</strong>: the object in which the Algolia answers are transformed into. This object is passed to the result event handler.
+An example of SearchResults in JSON is available at <a href="#results-format">the end of this readme</a></p>
+<h3>Search</h3><p>The search is triggered by the <code>search()</code> method.</p>
+<p>It takes all the previous modifications to the search and uses them to create the queries to Algolia. The search parameters are immutable.</p>
+<p>Example:</p>
+<pre class="prettyprint source lang-js"><code>var helper = algoliasearchHelper(client, indexName);
+
+// Let's monitor the results with the console
+helper.on('result', function(content) {
+  console.log(content);
+});
+
+// Let's make an empty search
+// The results are all sorted using the dashboard configuration
+helper.search();
+
+// Let's search for &quot;landscape&quot;
+helper.setQuery('landscape').search();
+
+// Let's add a category &quot;photo&quot;
+// Will make a search with &quot;photo&quot; tag and &quot;landscape&quot; as the query
+helper.addTag('photo').search();</code></pre><h3>Events</h3><p>The helper is a Node.js <a href="https://nodejs.org/api/events.html#events_class_events_eventemitter">EventEmitter</a> instance.</p>
+<p><code>result</code>: get notified when new results are received. The handler function will receive
+two objects (<code>SearchResults</code> and <code>SearchParameters</code>).</p>
+<p><code>error</code>: get notified when errors are received from the API.</p>
+<p><code>change</code>: get notified when a property has changed in the helper</p>
+<p><code>search</code> : get notified when a request is sent to Algolia</p>
+<h4>Listen to the <code>result</code> event</h4><pre class="prettyprint source lang-js"><code>helper.on('result', updateTheResults);</code></pre><h4>Listen to a <code>result</code> event once</h4><pre class="prettyprint source lang-js"><code>helper.once('result', updateTheResults);</code></pre><h4>Remove a <code>result</code> listener</h4><pre class="prettyprint source lang-js"><code>helper.removeListener('result', updateTheResults);</code></pre><h4>Remove all <code>result</code> listeners</h4><pre class="prettyprint source lang-js"><code>helper.removeAllListeners('result');</code></pre><p>All the methods from Node.js <a href="https://nodejs.org/api/events.html#events_class_events_eventemitter">EventEmitter</a> class are available.</p>
+<h3>Query</h3><h4>Do a search with the query &quot;fruit&quot;</h4><pre class="prettyprint source lang-javscript"><code>helper.setQuery('fruit').search();</code></pre><h3>Filtering results</h3><p>Facets are filters to retrieve a subset of an index having a specific value for a given attribute. First you need to define which attribute will be used as a facet in the dashboard: <a href="https://www.algolia.com/explorer#?tab=display">https://www.algolia.com/explorer#?tab=display</a></p>
+<h4>Regular (conjunctive) facets</h4><p>Refinements are ANDed by default (Conjunctive selection).</p>
+<h5>Facet definition</h5><pre class="prettyprint source lang-js"><code>var helper = algoliasearchHelper(client, indexName, {
+    facets: ['ANDFacet']
+});</code></pre><h5>Add a facet filter</h5><pre class="prettyprint source lang-js"><code>helper.addFacetRefinement('ANDFacet', 'valueOfANDFacet').search();</code></pre><h5>Remove a facet filter</h5><pre class="prettyprint source lang-js"><code>helper.removeFacetRefinement('ANDFacet', 'valueOfANDFacet').search();</code></pre><h4>Disjunctive facets</h4><p>Refinements are ORed by default (Disjunctive selection).</p>
+<h5>Facet definition</h5><pre class="prettyprint source lang-js"><code>var helper = algoliasearchHelper(client, indexName, {
+    disjunctiveFacets: ['ORFacet']
+});</code></pre><h5>Add a facet filter</h5><pre class="prettyprint source lang-js"><code>helper.addDisjunctiveFacetRefinement('ORFacet', 'valueOfORFacet').search();</code></pre><h5>Remove a facet filter</h5><pre class="prettyprint source lang-js"><code>helper.removeDisjunctiveFacetRefinement('ORFacet', 'valueOfORFacet').search();</code></pre><h4>Negative facets</h4><p>Filter so that we do NOT get a given facet</p>
+<h5>Facet definition (same as &quot;AND&quot; facet)</h5><pre class="prettyprint source lang-js"><code>var helper = algoliasearchHelper(client, indexName, {
+    facets: ['ANDFacet']
+}).search();</code></pre><h5>Exclude a value for a facet</h5><pre class="prettyprint source lang-js"><code>helper.addFacetExclusion('ANDFacet', 'valueOfANDFacetToExclude');</code></pre><h5>Remove an exclude from the list of excluded values</h5><pre class="prettyprint source lang-js"><code>helper.removeFacetExclusion('ANDFacet', 'valueOfANDFacetToExclude');</code></pre><h4>Numeric facets</h4><p>Filter over numeric attributes with math operations like <code>=</code>, <code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code>. Can be used for numbers and dates (if converted to timestamp)</p>
+<h5>Facet definition</h5><pre class="prettyprint source lang-js"><code>var helper = algoliasearchHelper(client, indexName, {
+  disjunctiveFacets: ['numericAttribute']
+});</code></pre><h5>Add numeric refinements</h5><pre class="prettyprint source lang-js"><code>helper.addNumericRefinement('numericAttribute', '=', '3').search();
+// filter to only the results that match numericAttribute=3
+helper.addNumericRefinement('numericAttribute', '=', '4').search();
+// filter to only the results that match numericAttribute=3 AND numericAttribute=4
+
+// On another numeric with no previous filter
+helper.addNumericRefinement('numericAttribute2', '=', ['42', '56', '37'] ).search();
+// filter to only the results that match numericAttribute=42 OR numericAttribute2=56 OR numericAttribute2=37</code></pre><h5>Remove a numeric refinement</h5><pre class="prettyprint source lang-js"><code>helper.removeNumericRefinement('numericAttribute', '=', '3').search();</code></pre><h5>Batch numeric filter removal</h5><pre class="prettyprint source lang-js"><code>// for the single operator = on numericAttribute
+helper.removeNumericRefinement('numericAttribute', '=').search();
+// for all the refinements on numericAttribute
+helper.removeNumericRefinement('numericAttribute').search();</code></pre><h4>Hierarchical facets</h4><p>Hierarchical facets are useful to build such navigation menus:</p>
+<pre class="prettyprint source lang-txt"><code>| products
+  > fruits
+    > citrus
+    | strawberries
+    | peaches
+    | apples</code></pre><p>Here, we refined the search this way:</p>
+<ul>
+<li>click on fruits</li>
+<li>click on citrus</li>
+</ul>
+<h5>Usage</h5><p>To build such menu, you need to use hierarchical faceting:</p>
+<pre class="prettyprint source lang-javascript"><code>var helper = algoliasearchHelper(client, indexName, {
+  hierarchicalFacets: [{
+    name: 'products',
+    attributes: ['categories.lvl0', 'categories.lvl1']
+  }]
+});</code></pre><p>Given your objects looks like this:</p>
+<pre class="prettyprint source lang-json"><code>{
+  &quot;objectID&quot;: &quot;123&quot;,
+  &quot;name&quot;: &quot;orange&quot;,
+  &quot;categories&quot;: {
+    &quot;lvl0&quot;: &quot;fruits&quot;,
+    &quot;lvl1&quot;: &quot;fruits > citrus&quot;
+  }
+}</code></pre><p>And you refine <code>products</code>:</p>
+<pre class="prettyprint source lang-js"><code>helper.toggleRefinement('products', 'fruits > citrus');</code></pre><p>You will get a hierarchical presentation of your facet values: a navigation menu
+of your facet values.</p>
+<pre class="prettyprint source lang-js"><code>helper.on('result', function(data){
+  console.log(data.hierarchicalFacets[0]);
+  // {
+  //   'name': 'products',
+  //   'count': null,
+  //   'isRefined': true,
+  //   'path': null,
+  //   'data': [{
+  //     'name': 'fruits',
+  //     'path': 'fruits',
+  //     'count': 1,
+  //     'isRefined': true,
+  //     'data': [{
+  //       'name': 'citrus',
+  //       'path': 'fruits > citrus',
+  //       'count': 1,
+  //       'isRefined': true,
+  //       'data': null
+  //     }]
+  //   }]
+  // }
+});</code></pre><p>To ease navigation, we always:</p>
+<ul>
+<li>provide the root level categories</li>
+<li>provide the current refinement sub categories (<code>fruits &gt; citrus &gt; *</code>: n + 1)</li>
+<li>provide the parent refinement (<code>fruits &gt; citrus</code> =&gt; <code>fruits</code>: n -1) categories</li>
+<li>refine the search using the current hierarchical refinement</li>
+</ul>
+<h5>Multiple values per level</h5><p>Your records can also share multiple categories between one another by using arrays inside your object:</p>
+<pre class="prettyprint source lang-json"><code>{
+  &quot;objectID&quot;: &quot;123&quot;,
+  &quot;name&quot;: &quot;orange&quot;,
+  &quot;categories&quot;: {
+    &quot;lvl0&quot;: [&quot;fruits&quot;, &quot;color&quot;],
+    &quot;lvl1&quot;: [&quot;fruits > citrus&quot;, &quot;color > orange&quot;]
+  }
+},
+{
+  &quot;objectID&quot;: &quot;456&quot;,
+  &quot;name&quot;: &quot;grapefruit&quot;,
+  &quot;categories&quot;: {
+    &quot;lvl0&quot;: [&quot;fruits&quot;, &quot;color&quot;, &quot;new&quot;],
+    &quot;lvl1&quot;: [&quot;fruits > citrus&quot;, &quot;color > yellow&quot;, &quot;new > citrus&quot;]
+  }
+}</code></pre><h5>Specifying another separator</h5><pre class="prettyprint source lang-js"><code>var helper = algoliasearchHelper(client, indexName, {
+  hierarchicalFacets: [{
+    name: 'products',
+    attributes: ['categories.lvl0', 'categories.lvl1'],
+    separator: '|'
+  }]
+});
+
+helper.toggleRefinement('products', 'fruits|citrus');</code></pre><p>Would mean that your objects look like so:</p>
+<pre class="prettyprint source lang-json"><code>{
+  &quot;objectID&quot;: &quot;123&quot;,
+  &quot;name&quot;: &quot;orange&quot;,
+  &quot;categories&quot;: {
+    &quot;lvl0&quot;: &quot;fruits&quot;,
+    &quot;lvl1&quot;: &quot;fruits|citrus&quot;
+  }
+}</code></pre><h5>Specifying a different sort order for values</h5><p>The default sort for the hierarchical facet view is: <code>isRefined:desc (first show refined), name:asc (then sort by name)</code>.</p>
+<p>You can specify a different sort order by using:</p>
+<pre class="prettyprint source lang-js"><code>var helper = algoliasearchHelper(client, indexName, {
+  hierarchicalFacets: [{
+    name: 'products',
+    attributes: ['categories.lvl0', 'categories.lvl1'],
+    sortBy: ['count:desc', 'name:asc'] // first show the most common values, then sort by name
+  }]
+});</code></pre><p>The available sort tokens are:</p>
+<ul>
+<li>count</li>
+<li>isRefined</li>
+<li>name</li>
+<li>path</li>
+</ul>
+<h5>Restrict results and hierarchical values to non-root level</h5><p>Let's say you have a lot of levels:</p>
+<pre class="prettyprint source"><code>- fruits
+  - yellow
+    - citrus
+      - spicy</code></pre><p>But you only want to get the values starting at &quot;citrus&quot;, you can use <code>rootPath</code></p>
+<p>You can specify an root path to filter the hierarchical values</p>
+<pre class="prettyprint source"><code>var helper = algoliasearchHelper(client, indexName, {
+  hierarchicalFacets: [{
+    name: 'products',
+    attributes: ['categories.lvl0', 'categories.lvl1', 'categories.lvl2', 'categories.lvl3'],
+    rootPath: 'fruits > yellow > citrus'
+  }]
+});</code></pre><p>Having a rootPath will refine the results on it <strong>automatically</strong>.</p>
+<h5>Hide parent level of current parent level</h5><p>By default the hierarchical facet is going to return the child and parent facet values of the current refinement.</p>
+<p>If you do not want to get the parent facet values you can set showParentLevel to false</p>
+<pre class="prettyprint source lang-js"><code>var helper = algoliasearchHelper(client, indexName, {
+  hierarchicalFacets: [{
+    name: 'products',
+    attributes: ['categories.lvl0', 'categories.lvl1'],
+    showParentLevel: false
+  }]
+});</code></pre><h5>Asking for the current breadcrumb</h5><pre class="prettyprint source lang-js"><code>var helper = algoliasearchHelper(client, indexName, {
+  hierarchicalFacets: [{
+    name: 'products',
+    attributes: ['categories.lvl0', 'categories.lvl1'],
+    separator: '|'
+  }]
+});
+
+helper.toggleRefinement('products', 'fruits|citrus');
+var breadcrumb = helper.getHierarchicalFacetBreadcrumb('products');
+
+console.log(breadcrumb);
+// ['fruits', 'citrus']
+
+console.log(breadcrumb.join(' | '));
+// 'fruits | citrus'</code></pre><h4>Clearing filters</h4><h5>Clear all the refinements for all the refined attributes</h5><pre class="prettyprint source lang-js"><code>helper.clearRefinements().search();</code></pre><h5>Clear all the refinements for a specific attribute</h5><pre class="prettyprint source lang-js"><code>helper.clearRefinements('ANDFacet').search();</code></pre><h5>[ADVANCED] Clear only the exclusions on the &quot;ANDFacet&quot; attribute</h5><pre class="prettyprint source lang-js"><code>helper.clearRefinements(function(value, attribute, type) {
+  return type === 'exclude' && attribute === 'ANDFacet';
+}).search();</code></pre><h3>Facet utilities</h3><h4>Get the values of a facet with the default sort</h4><pre class="prettyprint source lang-js"><code>helper.on('result', function(result) {
+  // Get the facet values for the attribute age
+  result.getFacetValues('age');
+  // It will be ordered :
+  //  - refined facets first
+  //  - then ordered by number of occurence (bigger count -> higher in the list)
+  //  - then ordered by name (alphabetically)
+});</code></pre><h4>Get the values of a facet with a custom sort</h4><pre class="prettyprint source lang-js"><code>helper.on('result', function(result) {
+  // Get the facet values for the attribute age
+  result.getFacetValues('age', {sortBy: ['count:asc']});
+  // It will be ordered by number of occurence (lower number => higher position)
+  // Elements that can be sorted : count, name, isRefined
+  // Type of sort : 'asc' for ascending order, 'desc' for descending order
+});</code></pre><h4>Get the facet stats</h4><p><em>This only apply on numeric based facets/attributes.</em></p>
+<pre class="prettyprint source lang-js"><code>helper.on('result', function(result) {
+  // Get the facet values for the attribute age
+  result.getFacetStats('age');
+});</code></pre><h3>Tags</h3><p>Tags are an easy way to do filtering. They are based on a special attribute in the records named <code>_tags</code>, which can be a single string value or an array of strings.</p>
+<h4>Add a tag filter for the value &quot;landscape&quot;</h4><pre class="prettyprint source lang-js"><code>helper.addTag('landscape').search();</code></pre><h4>Remove a tag filter for the value &quot;landscape&quot;</h4><pre class="prettyprint source lang-js"><code>helper.removeTag('landscape').search();</code></pre><h4>Clear all the tags filters</h4><pre class="prettyprint source lang-js"><code>helper.clearTags().search();</code></pre><h3>Pagination</h3><h4>Get the current page</h4><pre class="prettyprint source lang-js"><code>helper.getCurrentPage();</code></pre><h4>Change page</h4><pre class="prettyprint source lang-js"><code>helper.setCurrentPage(3).search();</code></pre><h3>Index</h3><p>Index can be changed. The common use case is when you have several slaves with different sort order (sort by relevance, price or any other attribute).</p>
+<h4>Change the current index</h4><pre class="prettyprint source lang-js"><code>helper.setIndex('index_orderByPrice').search();</code></pre><h4>Get the current index</h4><pre class="prettyprint source lang-js"><code>var currentIndex = helper.getIndex();</code></pre><h3>One time query</h3><p>Sometime it's convenient to reuse the current search parameters with small changes
+without changing the state stored in the helper. That's why there is a function
+called <code>searchOnce</code>. This method does not trigger <code>change</code> or <code>error</code> events.</p>
+<p>In the following, we are using <code>searchOnce</code> to fetch only a single element using
+all the other parameters already set in the search parameters.</p>
+<h4>Using searchOnce with a callback</h4><pre class="prettyprint source lang-js"><code>var state = helper.searchOnce(
+  {hitsPerPage: 1},
+  function(error, content, state) {
+    // if an error occured it will be passed in error, otherwise its value is null
+    // content contains the results formatted as a SearchResults
+    // state is the instance of SearchParameters used for this search
+  });</code></pre><h4>Using searchOnce with a promise</h4><pre class="prettyprint source lang-js"><code>var state1 = helper.searchOnce({hitsPerPage: 1})
+                   .then(function(res) {
+  // res contains
+  // {
+  //   content : SearchResults
+  //   state : SearchParameters (the one used for this specific search)
+  // }
+});</code></pre><h3>URL Helpers</h3><h4>Get a query string of a part of the parameters</h4><pre class="prettyprint source lang-js"><code>// see the jsdoc for the parameters
+// http://algolia.github.io/algoliasearch-helper-js/docs/AlgoliaSearchHelper.html#getStateAsQueryString
+var qs = helper.getStateAsQueryString();
+// by defaults it serialize the current index, the query and all the refinements</code></pre><h4>Set the state from a query string</h4><pre class="prettyprint source lang-js"><code>helper.setStateFromQueryString(qs);</code></pre><h4>Get a plain object with a subset of the state</h4><pre class="prettyprint source lang-js"><code>// to an object with the query and all the refinements
+helper.getState(['query', 'attribute:*']);</code></pre><h4>Get an object for the helper configuration in the query string</h4><pre class="prettyprint source lang-js"><code>var state = algoliasearchHelper.url.getStateFromQueryString(qs);</code></pre><h4>Get the configuration contained in the query string that is not for the helper</h4><pre class="prettyprint source lang-js"><code>var otherConf = algoliasearchHelper.url.getUnrecognizedParametersInQueryString(qs);</code></pre><h4>Get the query string of any state</h4><pre class="prettyprint source lang-js"><code>var state = helper.state;
+var qs = algoliasearchHelper.url.getQueryStringFromState(state);</code></pre><h3>Query parameters</h3><p>There are lots of other parameters you can set.</p>
+<h4>Set a parameter at the initialization of the helper</h4><pre class="prettyprint source lang-js"><code>var helper = algoliasearchHelper(client, indexName, {
+    hitsPerPage: 50
+});</code></pre><h4>Set a parameter later</h4><pre class="prettyprint source lang-js"><code>helper.setQueryParameter('hitsPerPage', 20).search();</code></pre><h4>List of parameters that can be set</h4><table cellspacing="0" cellpadding="0" class="params">
+  <tbody>
+    <tr>
+      <td valign="top" class="td1">
+        <p class="p1"><span class="s1"><b>Name</b></span></p>
+      </td>
+      <td valign="top" class="td2">
+        <p class="p1"><span class="s1"><b>Type</b></span></p>
+      </td>
+      <td valign="top" class="td3">
+        <p class="p1"><span class="s1"><b>Description</b></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">advancedSyntax</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">boolean</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">Enable the advanced syntax.</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#advancedSyntax">advancedSyntax on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">allowTyposOnNumericTokens</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">boolean</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">Should the engine allow typos on numerics.</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#allowTyposOnNumericTokens">allowTyposOnNumericTokens on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">analytics</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">boolean</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">Enable the analytics</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#analytics">analytics on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">analyticsTags</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">string</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">Tag of the query in the analytics.</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#analyticsTags">analyticsTags on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">aroundLatLng</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">string</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">Center of the geo search.</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#aroundLatLng">aroundLatLng on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">aroundLatLngViaIP</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">boolean</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">Center of the search, retrieve from the user IP.</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#aroundLatLngViaIP">aroundLatLngViaIP on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">aroundPrecision</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">number</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">Precision of the geo search.</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#aroundPrecision">aroundPrecision on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">aroundRadius</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">number</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">Radius of the geo search.</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#aroundRadius">aroundRadius on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">minimumAroundRadius</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">number</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">Minimum radius of the geo search.</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#minimumAroundRadius">minimumAroundRadius on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">attributesToHighlight</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">string</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">List of attributes to highlight</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#attributesToHighlight">attributesToHighlight on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">attributesToRetrieve</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">string</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">List of attributes to retrieve</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#attributesToRetrieve">attributesToRetrieve on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">attributesToSnippet</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">string</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">List of attributes to snippet</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#attributesToSnippet">attributesToSnippet on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">disjunctiveFacets</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">Array.&lt;string&gt;</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p1"><span class="s1">All the declared disjunctive facets</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">distinct</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">boolean</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">Remove duplicates based on the index setting attributeForDistinct</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#distinct">distinct on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">facets</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">Array.&lt;string&gt;</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p1"><span class="s1">All the facets that will be requested to the server</span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">getRankingInfo</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">integer</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">Enable the ranking informations in the response</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#getRankingInfo">getRankingInfo on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">hitsPerPage</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">number</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">Number of hits to be returned by the search API</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#hitsPerPage">hitsPerPage on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">ignorePlurals</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">boolean</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">Should the plurals be ignored</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#ignorePlurals">ignorePlurals on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">insideBoundingBox</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">string</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">Geo search inside a box.</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#insideBoundingBox">insideBoundingBox on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">insidePolygon</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">string</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">Geo search inside a polygon.</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#insidePolygon">insidePolygon on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">maxValuesPerFacet</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">number</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">Number of values for each facetted attribute</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#maxValuesPerFacet">maxValuesPerFacet on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">minWordSizefor1Typo</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">number</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">Number of characters to wait before doing one character replacement.</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#minWordSizefor1Typo">minWordSizefor1Typo on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">minWordSizefor2Typos</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">number</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">Number of characters to wait before doing a second character replacement.</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#minWordSizefor2Typos">minWordSizefor2Typos on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">optionalWords</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">string</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">Add some optional words to those defined in the dashboard</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#optionalWords">optionalWords on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">page</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">number</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">The current page number</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#page">page on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">query</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">string</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">Query string of the instant search. The empty string is a valid query.</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#query">query on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">queryType</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">string</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">How the query should be treated by the search engine. Possible values: prefixAll, prefixLast, prefixNone</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#queryType">queryType on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">removeWordsIfNoResults</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">string</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">Possible values are &quot;lastWords&quot; &quot;firstWords&quot; &quot;allOptional&quot; &quot;none&quot; (default)</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#removeWordsIfNoResults">removeWordsIfNoResults on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">replaceSynonymsInHighlight</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">boolean</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">Should the engine replace the synonyms in the highlighted results.</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#replaceSynonymsInHighlight">replaceSynonymsInHighlight on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">restrictSearchableAttributes</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">string</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">Restrict which attribute is searched.</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#restrictSearchableAttributes">restrictSearchableAttributes on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">synonyms</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">boolean</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">Enable the synonyms</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#synonyms">synonyms on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">tagFilters</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">string</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">Contains the tag filters in the raw format of the Algolia API. Setting this parameter is not compatible with the of the add/remove/toggle methods of the tag api.</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#tagFilters">tagFilters on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+    <tr>
+      <td valign="top" class="td4">
+        <p class="p2"><span class="s2">typoTolerance</span></p>
+      </td>
+      <td valign="top" class="td5">
+        <p class="p3"><span class="s1">string</span></p>
+      </td>
+      <td valign="top" class="td6">
+        <p class="p4"><span class="s1">How the typo tolerance behave in the search engine. Possible values: true, false, min, strict</span></p>
+        <p class="p5"><span class="s1"><a href="https://www.algolia.com/doc#typoTolerance">typoTolerance on Algolia.com<span class="s3"></span></a></span></p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Results format</h3><p>Here is an example of a result object you get with the <code>result</code> event.</p>
+<pre class="prettyprint source lang-js"><code>{
+   &quot;hitsPerPage&quot;: 10,
+   &quot;processingTimeMS&quot;: 2,
+   &quot;facets&quot;: [
+      {
+         &quot;name&quot;: &quot;type&quot;,
+         &quot;data&quot;: {
+            &quot;HardGood&quot;: 6627,
+            &quot;BlackTie&quot;: 550,
+            &quot;Music&quot;: 665,
+            &quot;Software&quot;: 131,
+            &quot;Game&quot;: 456,
+            &quot;Movie&quot;: 1571
+         },
+         &quot;exhaustive&quot;: false
+      },
+      {
+         &quot;exhaustive&quot;: false,
+         &quot;data&quot;: {
+            &quot;Free shipping&quot;: 5507
+         },
+         &quot;name&quot;: &quot;shipping&quot;
+      }
+   ],
+   &quot;hits&quot;: [
+      {
+         &quot;thumbnailImage&quot;: &quot;http://img.bbystatic.com/BestBuy_US/images/products/1688/1688832_54x108_s.gif&quot;,
+         &quot;_highlightResult&quot;: {
+            &quot;shortDescription&quot;: {
+               &quot;matchLevel&quot;: &quot;none&quot;,
+               &quot;value&quot;: &quot;Safeguard your PC, Mac, Android and iOS devices with comprehensive Internet protection&quot;,
+               &quot;matchedWords&quot;: []
+            },
+            &quot;category&quot;: {
+               &quot;matchLevel&quot;: &quot;none&quot;,
+               &quot;value&quot;: &quot;Computer Security Software&quot;,
+               &quot;matchedWords&quot;: []
+            },
+            &quot;manufacturer&quot;: {
+               &quot;matchedWords&quot;: [],
+               &quot;value&quot;: &quot;Webroot&quot;,
+               &quot;matchLevel&quot;: &quot;none&quot;
+            },
+            &quot;name&quot;: {
+               &quot;value&quot;: &quot;Webroot SecureAnywhere Internet Security (3-Device) (1-Year Subscription) - Mac/Windows&quot;,
+               &quot;matchedWords&quot;: [],
+               &quot;matchLevel&quot;: &quot;none&quot;
+            }
+         },
+         &quot;image&quot;: &quot;http://img.bbystatic.com/BestBuy_US/images/products/1688/1688832_105x210_sc.jpg&quot;,
+         &quot;shipping&quot;: &quot;Free shipping&quot;,
+         &quot;bestSellingRank&quot;: 4,
+         &quot;shortDescription&quot;: &quot;Safeguard your PC, Mac, Android and iOS devices with comprehensive Internet protection&quot;,
+         &quot;url&quot;: &quot;http://www.bestbuy.com/site/webroot-secureanywhere-internet-security-3-devi…d=1219060687969&skuId=1688832&cmp=RMX&ky=2d3GfEmNIzjA0vkzveHdZEBgpPCyMnLTJ&quot;,
+         &quot;name&quot;: &quot;Webroot SecureAnywhere Internet Security (3-Device) (1-Year Subscription) - Mac/Windows&quot;,
+         &quot;category&quot;: &quot;Computer Security Software&quot;,
+         &quot;salePrice_range&quot;: &quot;1 - 50&quot;,
+         &quot;objectID&quot;: &quot;1688832&quot;,
+         &quot;type&quot;: &quot;Software&quot;,
+         &quot;customerReviewCount&quot;: 5980,
+         &quot;salePrice&quot;: 49.99,
+         &quot;manufacturer&quot;: &quot;Webroot&quot;
+      },
+      ....
+   ],
+   &quot;nbHits&quot;: 10000,
+   &quot;disjunctiveFacets&quot;: [
+      {
+         &quot;exhaustive&quot;: false,
+         &quot;data&quot;: {
+            &quot;5&quot;: 183,
+            &quot;12&quot;: 112,
+            &quot;7&quot;: 149,
+            ...
+         },
+         &quot;name&quot;: &quot;customerReviewCount&quot;,
+         &quot;stats&quot;: {
+            &quot;max&quot;: 7461,
+            &quot;avg&quot;: 157.939,
+            &quot;min&quot;: 1
+         }
+      },
+      {
+         &quot;data&quot;: {
+            &quot;Printer Ink&quot;: 142,
+            &quot;Wireless Speakers&quot;: 60,
+            &quot;Point & Shoot Cameras&quot;: 48,
+            ...
+         },
+         &quot;name&quot;: &quot;category&quot;,
+         &quot;exhaustive&quot;: false
+      },
+      {
+         &quot;exhaustive&quot;: false,
+         &quot;data&quot;: {
+            &quot;> 5000&quot;: 2,
+            &quot;1 - 50&quot;: 6524,
+            &quot;501 - 2000&quot;: 566,
+            &quot;201 - 500&quot;: 1501,
+            &quot;101 - 200&quot;: 1360,
+            &quot;2001 - 5000&quot;: 47
+         },
+         &quot;name&quot;: &quot;salePrice_range&quot;
+      },
+      {
+         &quot;data&quot;: {
+            &quot;Dynex™&quot;: 202,
+            &quot;Insignia™&quot;: 230,
+            &quot;PNY&quot;: 72,
+            ...
+         },
+         &quot;name&quot;: &quot;manufacturer&quot;,
+         &quot;exhaustive&quot;: false
+      }
+   ],
+   &quot;query&quot;: &quot;&quot;,
+   &quot;nbPages&quot;: 100,
+   &quot;page&quot;: 0,
+   &quot;index&quot;: &quot;bestbuy&quot;
+}</code></pre><h1>Browser support</h1><p>This project works fine on any <a href="https://en.wikipedia.org/wiki/ECMAScript#5th_Edition">ES5</a> browser, basically &gt;= IE9+.</p>
+<p>To get IE8 support you will have to include this:</p>
+<!--[if lte IE 8]>
+  <script src="//cdn.jsdelivr.net/core-js/2/shim.min.js"></script>
+<![endif]-->
+<p>Which will simulate most of the ES5 features in IE8.</p></article>
+    </section>
+
+
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Fri Dec 11 2015 13:49:36 GMT+0100 (CET) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

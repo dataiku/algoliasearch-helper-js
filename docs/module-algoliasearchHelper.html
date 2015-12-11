@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>algoliasearchHelper - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="algoliasearchHelper.module_url.html">url</a></li><li><a href="module-algoliasearchHelper.html">algoliasearchHelper</a></li></ul><h3>Classes</h3><ul><li><a href="AlgoliaSearchHelper.html">AlgoliaSearchHelper</a></li><li><a href="SearchParameters.html">SearchParameters</a></li><li><a href="SearchResults.html">SearchResults</a></li></ul><h3>Global</h3><ul><li><a href="global.html#recSort">recSort</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">algoliasearchHelper</h1>
+    
+
+    
+
+
+
+
+
+<section>
+
+<header>
+    
+        
+            
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+
+    
+        
+            <div class="description"><p>The algoliasearchHelper module contains everything needed to use the Algoliasearch
+Helper. It is a also a function that instanciate the helper.
+To use the helper, you also need the Algolia JS client v3.</p></div>
+        
+
+        
+            
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>client</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">AlgoliaSearch</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>an AlgoliaSearch client</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>index</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>the index name to query</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>opts</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="SearchParameters.html">SearchParameters</a></span>
+|
+
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>an object defining the initial config of the search. It doesn't have to be a {SearchParameters}, just an object containing the properties you need from it.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html#line8">index.js (line 8)</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="AlgoliaSearchHelper.html">AlgoliaSearchHelper</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>//using the UMD build
+var client = algoliasearch('latency', '6be0576ff61c053d5f9a3225e2a90f76');
+var helper = algoliasearchHelper(client, 'bestbuy', {
+  facets: ['shipping'],
+  disjunctiveFacets: ['category']
+});
+helper.on('result', function(result) {
+  console.log(result);
+});
+helper.toggleRefine('Movies &amp; TV Shows')
+      .toggleRefine('Free shipping')
+      .search();</code></pre>
+
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+<table class="params">
+<thead>
+  <tr>
+    <th>Name</th>
+    <th>Type</th>
+    <th class="last">Description</th>
+  </tr>
+</thead>
+
+  <tr id=".AlgoliaSearchHelper">
+    <td class="name" ><code>AlgoliaSearchHelper</code></td>
+    <td class="type-signature"><a href="AlgoliaSearchHelper.html">AlgoliaSearchHelper</a></td>
+    <td class="description">
+      <p>Constructor for the Helper.</p>
+      
+    </td>
+  </tr>
+
+  <tr id=".SearchParameters">
+    <td class="name" ><code>SearchParameters</code></td>
+    <td class="type-signature"><a href="SearchParameters.html">SearchParameters</a></td>
+    <td class="description">
+      <p>Constructor for the object containing all the parameters of the search.</p>
+      
+    </td>
+  </tr>
+
+  <tr id=".SearchResults">
+    <td class="name" ><code>SearchResults</code></td>
+    <td class="type-signature"><a href="SearchResults.html">SearchResults</a></td>
+    <td class="description">
+      <p>Constructor for the object containing the results of the search.</p>
+      
+    </td>
+  </tr>
+
+  <tr id=".url">
+    <td class="name" ><code>url</code></td>
+    <td class="type-signature">object</td>
+    <td class="description">
+      <p>URL tools to generate query string and parse them from/into
+SearchParameters</p>
+      
+    </td>
+  </tr>
+
+  <tr id=".version">
+    <td class="name" ><code>version</code></td>
+    <td class="type-signature">number</td>
+    <td class="description">
+      <p>The version currently used</p>
+      
+    </td>
+  </tr>
+
+</table>
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0-dev</a> on Fri Dec 11 2015 13:49:36 GMT+0100 (CET) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>
